@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Release Progress Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .add-release-section {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .add-release-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .add-release-btn:hover {
+            background-color: #45a049;
+        }
+
+        .track-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+        }
+
+        .railway-track {
+            position: relative;
+            width: 100%;
+            height: 150px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .track-title {
+            position: absolute;
+            top: -20px;
+            left: 10px;
+            font-weight: bold;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .track-line {
+            position: absolute;
+            width: 100%;
+            height: 10px;
+            background-color: #CCCCCC; /* Changed from brown to grey */
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .checkpoint-container {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .checkpoint {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #90EE90; /* Pale green for inactive */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            transition: all 0.5s ease;
+            z-index: 10;
+            position: relative;
+        }
+
+        .checkpoint.active {
+            background-color: #008000; /* Dark green for active */
+            color: white;
+        }
+
+        .checkpoint-checkmark {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 30px;
+            color: white;
+        }
+
+        .checkpoint.active .checkpoint-checkmark {
+            display: block;
+        }
+
+        .checkpoint-caption {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #333;
+        }
+
+        .checkpoint-date {
+            margin-top: 5px;
+            font-size: 10px;
+            color: #666;
+        }
+
+        .checkpoint:hover {
+            transform: scale(1.1);
+        }
+
+        .date-line {
+            position: absolute;
+            width: 2px;
+            height: calc(100% + 40px);
+            background-color: #FF4136;
+            z-index: 15;
+        }
+
+        .date-line-label {
+            position: absolute;
+            top: -20px;
+            font-size: 12px;
+            color: #FF4136;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .checkpoint {
+                width: 40px;
+                height: 40px;
+            }
+            .checkpoint-caption {
+                font-size: 10px;
+            }
+            .checkpoint-date {
+                font-size: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Release Progress Tracker</h1>
+        
+        <div class="add-release-section">
+            <button id="addReleaseBtn" class="add-release-btn">Add Release</button>
+        </div>
+
+        <div class="track-container" id="trackContainer">
+            <!-- Tracks will be dynamically added here -->
+        </div>
+    </div>
+
+    <script>
+        class ReleaseTracker {
+            constructor(trackId, releaseNumber) {
+                this.trackId = trackId;
+                this.releaseNumber = releaseNumber;
+                this.currentCheckpoint = 0;
+                this.checkpointPositions = [10, 40, 70, 90];
+                this.checkpointDetails = this.generateCheckpointDates();
+                this.createTrack();
+            }
+
+            generateCheckpointDates() {
+                const now = new Date();
+                
+                // Generate dates with progression
+                const uiFreezeDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+                const engCompleteDate = new Date(now.getFullYear(), now.getMonth() - 0.5, now.getDate());
+                const branchingDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                const gaDate = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate());
+
+                return [
+                    { 
+                        name: 'UI Freeze', 
+                        color: '#FF4136', 
+                        date: uiFreezeDate 
+                    },
+                    { 
+                        name: 'Eng Complete', 
+                        color: '#FF851B', 
+                        date: engCompleteDate 
+                    },
+                    { 
+                        name: 'Branching', 
+                        color: '#FFC300', 
+                        date: branchingDate 
+                    },
+                    { 
+                        name: 'GA', 
+                        color: '#2ECC40', 
+                        date: gaDate 
+                    }
+                ];
+            }
+
+            createTrack() {
+                const trackHtml = `
+                    <div class="railway-track" id="track-${this.trackId}">
+                        <div class="track-title">${this.releaseNumber}</div>
+                        <div class="track-line"></div>
+                        ${this.checkpointDetails.map((checkpoint, index) => `
+                            <div class="checkpoint-container" style="left: ${this.checkpointPositions[index]}%;">
+                                <div class="checkpoint" 
+                                     data-track="${this.trackId}" 
+                                     data-checkpoint="${index + 1}">
+                                    <span class="checkpoint-checkmark">✓</span>
+                                </div>
+                                <div class="checkpoint-caption">${checkpoint.name}</div>
+                                <div class="checkpoint-date">${checkpoint.date.toLocaleDateString()}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                document.getElementById('trackContainer').insertAdjacentHTML('beforeend', trackHtml);
+
+                // Setup checkpoints
+                this.track = document.getElementById(`track-${this.trackId}`);
+                this.checkpoints = this.track.querySelectorAll('.checkpoint');
+
+                // Add click event listeners to checkpoints
+                this.checkpoints.forEach(checkpoint => {
+                    checkpoint.addEventListener('click', () => this.moveToCheckpoint(checkpoint));
+                });
+            }
+
+            moveToCheckpoint(checkpoint) {
+                const checkpointIndex = parseInt(checkpoint.dataset.checkpoint) - 1;
+                
+                // Reset all checkpoints
+                this.checkpoints.forEach((cp, index) => {
+                    if (index <= checkpointIndex) {
+                        // Completed checkpoints: add active class
+                        cp.classList.add('active');
+                    } else {
+                        // Incomplete checkpoints: remove active class
+                        cp.classList.remove('active');
+                    }
+                });
+
+                // Update current checkpoint
+                this.currentCheckpoint = checkpointIndex + 1;
+            }
+        }
+
+        class ReleaseTrackerManager {
+            constructor(numberOfTracks = 3) {
+                this.trackers = [];
+                this.releaseNumbers = ['releases/23.15', 'releases/24.12', 'releases/25.6'];
+                this.createTracks(numberOfTracks);
+                this.updateCurrentDateLine();
+
+                // Add resize event listener to handle window resizing
+                window.addEventListener('resize', () => this.updateCurrentDateLine());
+
+                // Setup Add Release Button
+                this.setupAddReleaseButton();
+            }
+
+            createTracks(numberOfTracks) {
+                for (let i = 0; i < numberOfTracks; i++) {
+                    this.trackers.push(new ReleaseTracker(i, this.releaseNumbers[i]));
+                }
+            }
+
+            setupAddReleaseButton() {
+                const addReleaseBtn = document.getElementById('addReleaseBtn');
+                addReleaseBtn.addEventListener('click', () => {
+                    // Prompt for release number
+                    const releaseNumber = prompt('Enter the release number (e.g., releases/26.1):');
+                    
+                    if (releaseNumber && releaseNumber.trim() !== '') {
+                        // Create a new tracker with the next available track ID
+                        const newTrackId = this.trackers.length;
+                        const newTracker = new ReleaseTracker(newTrackId, releaseNumber);
+                        
+                        // Add to trackers array
+                        this.trackers.push(newTracker);
+                        
+                        // Update date line to ensure it's positioned correctly
+                        this.updateCurrentDateLine();
+                    }
+                });
+            }
+
+            updateCurrentDateLine() {
+                const now = new Date();
+                const trackContainer = document.getElementById('trackContainer');
+                
+                // Remove existing date line
+                const existingDateLine = document.querySelector('.date-line');
+                const existingDateLineLabel = document.getElementById('currentDateLabel');
+                if (existingDateLine) existingDateLine.remove();
+                if (existingDateLineLabel) existingDateLineLabel.remove();
+                
+                // Calculate the position of the date line
+                const dateLine = document.createElement('div');
+                dateLine.classList.add('date-line');
+                dateLine.style.left = '70%';
+                
+                const dateLabelText = document.createElement('div');
+                dateLabelText.id = 'currentDateLabel';
+                dateLabelText.classList.add('date-line-label');
+                dateLabelText.textContent = now.toLocaleDateString();
+                dateLabelText.style.left = 'calc(70% + 10px)';
+                
+                // Add new date line and label
+                trackContainer.appendChild(dateLine);
+                trackContainer.appendChild(dateLabelText);
+            }
+        }
+
+        // Initialize the release tracker manager with 3 tracks
+        const releaseTrackerManager = new ReleaseTrackerManager();
+    </script>
+</body>
+</html>
