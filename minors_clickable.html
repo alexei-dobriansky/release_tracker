@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minor releases</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f0f0f0;
+    }
+
+    .track-container {
+      position: relative;
+      width: 80%;
+      margin: 20px auto;
+      height: 70px;
+      background-color: #ddd;
+      border-radius: 25px;
+    }
+
+    .track {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 10px;
+      background-color: #aaa;
+      transform: translateY(-50%);
+    }
+
+    .checkpoint {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+      transition: background-color 0.3s ease-in-out;
+    }
+
+    .caption {
+      position: absolute;
+      font-size: 12px;
+      top: 70%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+    }
+
+    .train {
+      position: absolute;
+      width: 40px;
+      height: 20px;
+      border-radius: 5px;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      transition: left 1.5s ease-in-out, background-color 1.5s ease-in-out;
+    }
+
+    .track-name {
+      text-align: left;
+      font-weight: bold;
+      margin-left: 10%;
+    }
+
+    .track-name a {
+      text-decoration: none;
+      color: #007bff;
+    }
+
+    .track-name a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h1>Minor releases</h1>
+
+  <script>
+    function getProgressColor(progress) {
+      if (progress <= 10) return '#d32f2f'; // Red (start)
+      if (progress <= 40) return '#fbc02d'; // Yellow (middle)
+      if (progress <= 70) return '#8bc34a'; // Light Green (near end)
+      return '#388e3c'; // Dark Green (final)
+    }
+
+    function moveTrain(trainId, position) {
+      const train = document.getElementById(trainId);
+      train.style.left = position + '%';
+      train.style.backgroundColor = getProgressColor(position);
+    }
+
+    function setCheckpointColors() {
+      const checkpoints = document.querySelectorAll('.checkpoint');
+      checkpoints.forEach(cp => {
+        const progress = parseInt(cp.style.left);
+        cp.style.backgroundColor = getProgressColor(progress);
+      });
+    }
+
+    window.onload = setCheckpointColors;
+  </script>
+
+  <!-- Track 1 -->
+  <div class="track-name">
+    <a href="https://dev.azure.com/dynamicssmb2/Dynamics%20SMB/_workitems/edit/524239/" target="_blank">releases/23.18</a>
+  </div>
+  <div class="track-container">
+    <div class="track"></div>
+    <div class="checkpoint" style="left: 10%;" onclick="moveTrain('train1', 10)"></div>
+    <div class="caption" style="left: 10%;">UI Strings Freeze</div>
+    <div class="checkpoint" style="left: 40%;" onclick="moveTrain('train1', 40)"></div>
+    <div class="caption" style="left: 40%;">Engineering Complete</div>
+    <div class="checkpoint" style="left: 70%;" onclick="moveTrain('train1', 70)"></div>
+    <div class="caption" style="left: 70%;">Branching</div>
+    <div class="checkpoint" style="left: 100%;" onclick="moveTrain('train1', 100)"></div>
+    <div class="caption" style="left: 100%;">GA</div>
+    <div class="train" id="train1" style="left: 0%; background-color: #d32f2f;"></div>
+  </div>
+
+  <!-- Track 2 -->
+  <div class="track-name">
+    <a href="https://dev.azure.com/dynamicssmb2/Dynamics%20SMB/_workitems/edit/524240/" target="_blank">releases/24.12</a>
+  </div>
+  <div class="track-container">
+    <div class="track"></div>
+    <div class="checkpoint" style="left: 10%;" onclick="moveTrain('train2', 10)"></div>
+    <div class="caption" style="left: 10%;">UI Strings Freeze</div>
+    <div class="checkpoint" style="left: 40%;" onclick="moveTrain('train2', 40)"></div>
+    <div class="caption" style="left: 40%;">Engineering Complete</div>
+    <div class="checkpoint" style="left: 70%;" onclick="moveTrain('train2', 70)"></div>
+    <div class="caption" style="left: 70%;">Branching</div>
+    <div class="checkpoint" style="left: 100%;" onclick="moveTrain('train2', 100)"></div>
+    <div class="caption" style="left: 100%;">GA</div>
+    <div class="train" id="train2" style="left: 0%; background-color: #d32f2f;"></div>
+  </div>
+
+  <!-- Track 3 -->
+  <div class="track-name">
+    <a href="https://dev.azure.com/dynamicssmb2/Dynamics%20SMB/_workitems/edit/524241/" target="_blank">releases/25.6</a>
+  </div>
+  <div class="track-container">
+    <div class="track"></div>
+    <div class="checkpoint" style="left: 10%;" onclick="moveTrain('train3', 10)"></div>
+    <div class="caption" style="left: 10%;">UI Strings Freeze</div>
+    <div class="checkpoint" style="left: 40%;" onclick="moveTrain('train3', 40)"></div>
+    <div class="caption" style="left: 40%;">Engineering Complete</div>
+    <div class="checkpoint" style="left: 70%;" onclick="moveTrain('train3', 70)"></div>
+    <div class="caption" style="left: 70%;">Branching</div>
+    <div class="checkpoint" style="left: 100%;" onclick="moveTrain('train3', 100)"></div>
+    <div class="caption" style="left: 100%;">GA</div>
+    <div class="train" id="train3" style="left: 0%; background-color: #d32f2f;"></div>
+  </div>
+
+</body>
+</html>
